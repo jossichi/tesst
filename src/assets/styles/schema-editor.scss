@@ -1,0 +1,421 @@
+// src/assets/styles/components/_schemaEditor.scss
+
+/* ============================================= */
+/* ==      COMPONENT: SCHEMA EDITOR           == */
+/* ============================================= */
+
+// Sử dụng lại các biến màu đã định nghĩa
+:root {
+  --color-background: #111827;
+  --color-panel-bg: #1f2937;
+  --color-code-bg: #111827;
+  --color-border: #374151;
+  --color-text-primary: #f9fafb;
+  --color-text-secondary: #9ca3af;
+  --color-text-disabled: #6b7280;
+  --color-accent: #3b82f6;
+  --color-accent-hover: #2563eb;
+  --font-family-mono: "Fira Code", "JetBrains Mono", monospace;
+  --border-radius: 8px;
+  --transition: all 0.2s ease-in-out;
+
+  --color-accent-glow: rgba(59, 130, 246, 0.3); // Hiệu ứng glow
+
+  // Font chữrgba(61, 61, 61, 0.3)
+  --font-family-sans: "Inter", -apple-system, sans-serif;
+
+  // Các biến khác
+  --border-color: #374151;
+  --border-radius: 10px; // Tăng nhẹ độ bo tròn
+  --transition-fast: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+} // Keyframe cho animation xuất hiện
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Kiểu chung cho panel, kế thừa từ .panel nếu có
+.schema-editor {
+  background-color: var(--color-panel-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  opacity: 0;
+  animation: fadeInUp 0.5s ease-out forwards;
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.3);
+  // Trạng thái trống
+  &.empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 300px;
+    color: var(--color-text-secondary);
+    font-style: italic;
+  }
+
+  // Header của panel
+  .schema-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+    background: linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0.03),
+      transparent
+    );
+
+    h3 {
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin: 0;
+      color: var(--color-text-primary);
+    }
+
+    // --- Nút bấm được nâng cấp ---
+    .actions button {
+      background-color: var(--color-accent);
+      border: 1px solid var(--color-accent-hover);
+      color: white;
+      padding: 0.6rem 1.2rem;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition-fast);
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+
+      &:hover {
+        background-color: var(--color-accent-hover);
+        box-shadow: 0 0 15px var(--color-accent-glow);
+        transform: translateY(-2px);
+      }
+      &:active {
+        transform: translateY(0);
+      }
+    }
+  }
+  .left-panel .field-list,
+  .center-panel .sample-rows,
+  .right-panel .json-view {
+    // For Webkit-based browsers (Chrome, Safari, Edge)
+    &::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    &::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    &::-webkit-scrollbar-thumb {
+      background-color: var(--border-color);
+      border-radius: 10px;
+      border: 2px solid var(--color-panel-bg); // Tạo khoảng cách với track
+    }
+    &::-webkit-scrollbar-thumb:hover {
+      background-color: var(--color-text-secondary);
+    }
+  }
+  // Body 3 cột
+  .schema-body {
+    display: grid;
+    // Tối ưu hóa layout: cột trái và phải cố định, cột giữa co giãn
+    grid-template-columns: minmax(280px, 1.2fr) 2fr minmax(320px, 1.5fr);
+    gap: 0; // Bỏ gap để dùng border làm vạch ngăn
+    padding: 1.5rem;
+  }
+
+  // Tiêu đề nhỏ trong các panel
+  h4 {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--color-text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 1rem;
+  }
+  // Panel bên trong các cột
+  .left-panel,
+  .center-panel,
+  .right-panel {
+    padding: 0 1.5rem;
+    opacity: 0;
+    animation: fadeInUp 0.5s ease-out forwards;
+
+    // Animation xuất hiện lần lượt
+    &:nth-child(1) {
+      animation-delay: 100ms;
+    }
+    &:nth-child(2) {
+      animation-delay: 200ms;
+    }
+    &:nth-child(3) {
+      animation-delay: 300ms;
+    }
+  }
+  .right-panel {
+    .json-view {
+      background-color: var(--color-code-bg);
+      border: 1px solid var(--color-border);
+      border-radius: var(--border-radius);
+      padding: 1rem;
+      max-height: 520px;
+      overflow: auto;
+
+      // Ghi đè style của react-json-view để hợp theme
+      div.react-json-view {
+        background-color: transparent !important;
+        font-family: var(--font-family-mono) !important;
+        font-size: 0.85rem !important; // Điều chỉnh font-size cho dễ đọc
+
+        .string-value,
+        .boolean-value,
+        .number-value {
+          font-weight: 500;
+        }
+
+        // Làm nổi bật các khóa (keys)
+        .object-key-string,
+        .array-key-string {
+          color: #e2e2e2 !important;
+          font-weight: 600;
+        }
+
+        // Làm nổi bật các giá trị (values)
+        .string-value {
+          color: #e6db74 !important; // Màu vàng
+        }
+        .number-value {
+          color: #ae81ff !important; // Màu tím
+        }
+        .boolean-value {
+          color: #a6e22e !important; // Màu xanh lá
+        }
+
+        // Làm nổi bật các dấu ngoặc
+        .fa-caret-right,
+        .fa-caret-down {
+          color: var(--color-text-secondary) !important;
+          opacity: 0.7;
+        }
+
+        .object-container,
+        .array-container {
+          border-left: 1px solid rgba(255, 255, 255, 0.1);
+          padding-left: 1rem;
+        }
+      }
+    }
+  }
+  // Vạch ngăn cách giữa các cột
+  .center-panel {
+    border-left: 1px solid var(--border-color);
+    border-right: 1px solid var(--border-color);
+  }
+
+  h4 {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--color-text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border-color);
+  }
+  /* --- LEFT PANEL --- */
+  .left-panel .field-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    max-height: 520px;
+    overflow-y: auto;
+
+    li {
+      margin-bottom: 0.25rem;
+
+      label {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.6rem 0.75rem;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+
+        &:hover {
+          background-color: lighten($color: #1f2937, $amount: 5%);
+        }
+
+        // --- Custom Checkbox ---
+        input[type="checkbox"] {
+          appearance: none; // Ẩn hoàn toàn checkbox gốc
+          flex-shrink: 0;
+          position: relative;
+          width: 20px;
+          height: 20px;
+          border: 2px solid var(--border-color);
+          border-radius: 4px;
+          background-color: var(--color-background);
+          transition: var(--transition-fast);
+          cursor: pointer;
+
+          // Hiệu ứng checkmark
+          &::before {
+            content: "";
+            position: absolute;
+            top: 2px;
+            left: 6px;
+            width: 5px;
+            height: 10px;
+            border: solid white;
+            border-width: 0 3px 3px 0;
+            transform: rotate(45deg) scale(0); // Bắt đầu ẩn
+            opacity: 0;
+            transition: all 0.2s cubic-bezier(0.18, 0.89, 0.32, 1.28); // Hiệu ứng nảy
+          }
+
+          &:checked {
+            background-color: var(--color-accent);
+            border-color: var(--color-accent);
+            &::before {
+              transform: rotate(45deg) scale(1);
+              opacity: 1;
+            }
+          }
+
+          &:not(:checked) ~ .field-name,
+          &:not(:checked) ~ .field-type {
+            opacity: 0.4;
+            text-decoration: line-through;
+          }
+        }
+      }
+
+      .custom-checkbox {
+        flex-shrink: 0;
+        position: relative;
+        width: 18px;
+        height: 18px;
+        border: 2px solid var(--color-border);
+        border-radius: 4px;
+        background-color: var(--color-background);
+        transition: all 0.2s ease;
+
+        // Checkmark (dấu tick)
+        &::after {
+          content: "";
+          position: absolute;
+          left: 50%;
+          top: 45%;
+          width: 5px;
+          height: 10px;
+          border: solid white;
+          border-width: 0 2px 2px 0;
+          opacity: 0;
+          transform: translate(-50%, -50%) rotate(45deg) scale(0.5);
+          transition: all 0.2s ease;
+        }
+      }
+      .field-name,
+      .field-type {
+        transition: var(--transition-slow);
+      }
+      .field-name {
+        font-weight: 500;
+        transition: var(--transition);
+      }
+
+      .field-type {
+        margin-left: auto;
+        font-size: 0.75rem;
+        font-family: var(--font-family-mono);
+        color: var(--color-text-secondary);
+        background-color: var(--color-border);
+        padding: 0.15rem 0.5rem;
+        border-radius: 4px;
+        transition: var(--transition);
+      }
+    }
+  }
+
+  /* --- CENTER PANEL --- */
+  .center-panel {
+    // Styling cho form được tạo bởi RJSF
+    .rjsf-preview {
+      background-color: var(--color-background);
+      border: 1px solid var(--color-border);
+      border-radius: var(--border-radius);
+      padding: 1rem;
+      margin-bottom: 1.5rem;
+
+      // Ghi đè style của RJSF
+      .form-group {
+        margin-bottom: 1rem;
+      }
+      label {
+        font-weight: 500;
+        font-size: 0.9rem;
+        color: var(--color-text-secondary);
+        display: block;
+        margin-bottom: 0.5rem;
+      }
+      input[type="text"],
+      input[type="number"],
+      select {
+        width: 100%;
+        background-color: var(--color-panel-bg);
+        border: 1px solid var(--color-border);
+        color: var(--color-text-primary);
+        padding: 0.6rem 0.75rem;
+        border-radius: 6px;
+        transition: var(--transition);
+        &:focus {
+          outline: none;
+          border-color: var(--color-accent);
+          box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        }
+      }
+      // Ẩn nút submit mặc định của RJSF
+      button[type="submit"] {
+        display: none;
+      }
+    }
+
+    // Kiểu cho khu vực xem dữ liệu mẫu
+    .sample-rows {
+      background-color: var(--color-code-bg);
+      border: 1px solid var(--color-border);
+      border-radius: var(--border-radius);
+      padding: 1rem;
+      font-family: var(--font-family-mono);
+      font-size: 0.85rem;
+      max-height: 250px;
+      overflow: auto;
+      white-space: pre-wrap;
+    }
+  }
+
+  /* --- RIGHT PANEL --- */
+  .right-panel {
+    .json-view {
+      background-color: var(--color-code-bg);
+      border: 1px solid var(--color-border);
+      border-radius: var(--border-radius);
+      padding: 1rem;
+      max-height: 520px;
+      overflow: auto;
+
+      // Ghi đè một vài style của react-json-view để hợp theme
+      div.react-json-view {
+        background-color: transparent !important;
+        font-family: var(--font-family-mono) !important;
+      }
+    }
+  }
+}
