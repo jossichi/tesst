@@ -1,4 +1,4 @@
-// src/pages/UploadSchemaPage.jsx
+// UploadSchemaPage.jsx
 import React from "react";
 import FileUploader from "../components/FileUploader.jsx";
 import SchemaEditor from "../components/SchemaEditor.jsx";
@@ -10,6 +10,8 @@ import RelationshipsPanel from "../components/RelationshipsPanel.jsx";
 import AdvancedAnalysisPanel from "../components/AdvancedAnalysisPanel.jsx";
 import MongoDBPreview from "../components/MongoDBPreview.jsx";
 import Tabs from "../components/Tabs.jsx";
+import InsightCard from "../components/InsightCard.jsx";
+
 import "../assets/styles/upload.scss";
 
 export default function UploadSchemaPage() {
@@ -23,6 +25,7 @@ export default function UploadSchemaPage() {
   const [visualizations, setVisualizations] = React.useState(null);
   const [relationships, setRelationships] = React.useState(null);
   const [advanced, setAdvanced] = React.useState(null);
+  const [insights, setInsights] = React.useState([]);
 
   const tabs = React.useMemo(() => {
     const panels = [];
@@ -33,7 +36,6 @@ export default function UploadSchemaPage() {
         title: "Data Understanding",
         content: (
           <section className="data-understanding-section">
-            <h2 className="sr-only">Step 1: Understand the Data</h2>
             <table className="data-understanding">
               <thead>
                 <tr>
@@ -65,12 +67,7 @@ export default function UploadSchemaPage() {
       panels.push({
         id: "sample-data",
         title: "Sample Data",
-        content: (
-          <section className="mongodb-preview-section">
-            <h2 className="sr-only">MongoDB-style Sample Preview</h2>
-            <MongoDBPreview data={rawPreviewRows} />
-          </section>
-        ),
+        content: <MongoDBPreview data={rawPreviewRows} />,
       });
     }
 
@@ -122,6 +119,31 @@ export default function UploadSchemaPage() {
       });
     }
 
+    if (insights?.length > 0) {
+      panels.push({
+        id: "insights",
+        title: "Insights",
+        content: (
+          <section className="insights-section">
+            {insights.map((ins, idx) => {
+              let type = "info";
+              if (ins.includes("❗") || ins.includes("⚠️")) type = "warning";
+              if (ins.includes("✅")) type = "success";
+              if (ins.includes("🚨")) type = "error";
+              return (
+                <InsightCard
+                  key={idx}
+                  type={type}
+                  title={`Insight ${idx + 1}`}
+                  message={ins}
+                />
+              );
+            })}
+          </section>
+        ),
+      });
+    }
+
     return panels;
   }, [
     understanding,
@@ -132,6 +154,7 @@ export default function UploadSchemaPage() {
     visualizations,
     relationships,
     advanced,
+    insights,
   ]);
 
   return (
@@ -156,7 +179,8 @@ export default function UploadSchemaPage() {
               descriptiveResult,
               visualizationResult,
               relationshipsResult,
-              advancedResult
+              advancedResult,
+              insightsResult
             ) => {
               setSchema(generatedSchema);
               setRawPreviewRows(previewRows || []);
@@ -167,6 +191,7 @@ export default function UploadSchemaPage() {
               setVisualizations(visualizationResult || null);
               setRelationships(relationshipsResult || null);
               setAdvanced(advancedResult || null);
+              setInsights(insightsResult || []);
             }}
           />
         </div>

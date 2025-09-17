@@ -1,0 +1,155 @@
+// Variables
+$bg-color: #0a0a0a;
+$text-color: #e0e0e0;
+$sub-text-color: #a0a0a0;
+$border-color: rgba(255, 255, 255, 0.1);
+
+// Colors for different types
+$warning-color: #ffc107;
+$success-color: #4caf50;
+$info-color: #00bcd4;
+$error-color: #f44336;
+
+// Keyframes
+@keyframes neon-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 5px;
+  }
+  50% {
+    box-shadow: 0 0 15px;
+  }
+}
+
+@keyframes scan-glow {
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 100% 50%;
+  }
+}
+
+.cyber-insight-card {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 1.5rem;
+  background: rgba(15, 15, 15, 0.6);
+  border: 1px solid $border-color;
+  border-radius: 1rem;
+  backdrop-filter: blur(10px);
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  font-family: "Courier Prime", monospace;
+
+  // Neon border effect on top
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, currentColor, transparent);
+    animation: scan-glow 3s infinite linear;
+  }
+
+  // Responsive
+  @media (max-width: 600px) {
+    flex-direction: column;
+    text-align: center;
+    padding: 1rem;
+    gap: 0.5rem;
+    .icon-wrapper {
+      margin-bottom: 0.5rem;
+    }
+  }
+
+  // Type-specific colors and glows
+  &.warning {
+    color: $warning-color;
+    &::before {
+      background: linear-gradient(
+        90deg,
+        transparent,
+        $warning-color,
+        transparent
+      );
+    }
+    .icon {
+      animation: neon-pulse 2s infinite ease-in-out;
+    }
+  }
+  &.success {
+    color: $success-color;
+    &::before {
+      background: linear-gradient(
+        90deg,
+        transparent,
+        $success-color,
+        transparent
+      );
+    }
+    .icon {
+      animation: neon-pulse 3s infinite ease-in-out;
+    }
+  }
+  &.info {
+    color: $info-color;
+    &::before {
+      background: linear-gradient(90deg, transparent, $info-color, transparent);
+    }
+    .icon {
+      animation: neon-pulse 4s infinite ease-in-out;
+    }
+  }
+  &.error {
+    color: $error-color;
+    &::before {
+      background: linear-gradient(
+        90deg,
+        transparent,
+        $error-color,
+        transparent
+      );
+    }
+    .icon {
+      animation: neon-pulse 1.5s infinite ease-in-out;
+    }
+  }
+}
+
+.icon-wrapper {
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  .icon {
+    width: 100%;
+    height: 100%;
+    filter: drop-shadow(0 0 5px currentColor);
+    stroke-width: 1.5;
+  }
+}
+
+.content {
+  flex-grow: 1;
+}
+
+.insight-title {
+  font-size: 1.25rem;
+  font-weight: bold;
+  margin-bottom: 0.25rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.insight-message {
+  font-size: 1rem;
+  color: $sub-text-color;
+}

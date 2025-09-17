@@ -1,6 +1,9 @@
+[build]
+  command = "npm install --legacy-peer-deps && npm run build"
+  publish = "build"
+  node_version = "20.11.1" # Hoặc node version tương thích nếu bạn muốn chỉ định
+
 [[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
-[build]
-  command = "npm install --legacy-peer-deps && npm run build"

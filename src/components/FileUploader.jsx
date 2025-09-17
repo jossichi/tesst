@@ -24,7 +24,8 @@ export default function FileUploader({ onSchema }) {
         data.descriptive,
         data.visualizations,
         data.relationships,
-        data.advanced
+        data.advanced,
+        data.insights
       );
     } catch (err) {
       console.error("Lỗi khi upload:", err);
