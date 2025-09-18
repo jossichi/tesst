@@ -11,7 +11,7 @@ import AdvancedAnalysisPanel from "../components/AdvancedAnalysisPanel.jsx";
 import MongoDBPreview from "../components/MongoDBPreview.jsx";
 import Tabs from "../components/Tabs.jsx";
 import InsightCard from "../components/InsightCard.jsx";
-
+import ReportVisualizer from "../components/ReportVisualizer.jsx";
 import "../assets/styles/upload.scss";
 
 export default function UploadSchemaPage() {
@@ -26,6 +26,7 @@ export default function UploadSchemaPage() {
   const [relationships, setRelationships] = React.useState(null);
   const [advanced, setAdvanced] = React.useState(null);
   const [insights, setInsights] = React.useState([]);
+  const [businessReport, setBusinessReport] = React.useState(null);
 
   const tabs = React.useMemo(() => {
     const panels = [];
@@ -143,6 +144,13 @@ export default function UploadSchemaPage() {
         ),
       });
     }
+    if (businessReport) {
+      panels.push({
+        id: "business-report",
+        title: "Business Report",
+        content: <ReportVisualizer report={businessReport} />,
+      });
+    }
 
     return panels;
   }, [
@@ -155,6 +163,7 @@ export default function UploadSchemaPage() {
     relationships,
     advanced,
     insights,
+    businessReport,
   ]);
 
   return (
@@ -180,7 +189,8 @@ export default function UploadSchemaPage() {
               visualizationResult,
               relationshipsResult,
               advancedResult,
-              insightsResult
+              insightsResult,
+              businessReportResult
             ) => {
               setSchema(generatedSchema);
               setRawPreviewRows(previewRows || []);
@@ -192,6 +202,7 @@ export default function UploadSchemaPage() {
               setRelationships(relationshipsResult || null);
               setAdvanced(advancedResult || null);
               setInsights(insightsResult || []);
+              setBusinessReport(businessReportResult || []);
             }}
           />
         </div>

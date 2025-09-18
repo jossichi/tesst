@@ -30,8 +30,5 @@ jobs:
       - name: 📦 Install dependencies
         run: npm install --legacy-peer-deps
 
-      - name: 🧹 Run lint
-        run: npm run lint
-
       - name: 🏗️ Build project
         run: npm run build

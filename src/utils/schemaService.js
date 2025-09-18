@@ -1,9 +1,10 @@
 // src/services/schemaService.js
+import { API_URL } from "../constants";
 export async function uploadFileToServer(file) {
   const fd = new FormData();
   fd.append("file", file);
 
-  const res = await fetch("http://localhost:8000/api/parse-file", {
+  const res = await fetch(`${API_URL}/api/parse-file`, {
     method: "POST",
     body: fd,
   });
