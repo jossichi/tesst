@@ -1,5 +1,5 @@
 // UploadSchemaPage.jsx
-import React from "react";
+import React, { useState, useMemo, useRef } from "react";
 import FileUploader from "../components/FileUploader.jsx";
 import SchemaEditor from "../components/SchemaEditor.jsx";
 import DataInspectionPanel from "../components/DataInspectionPanel.jsx";
@@ -13,7 +13,9 @@ import Tabs from "../components/Tabs.jsx";
 import InsightCard from "../components/InsightCard.jsx";
 import ReportVisualizer from "../components/ReportVisualizer.jsx";
 import "../assets/styles/upload.scss";
-
+import PredictionResultPanel from "../components/PredictionResultPanel.jsx";
+import BeyondEDAViewer from "../components/BeyondEDAViewer.jsx"
+import AnalysisTimingDisplay from "../components/AnalysisTimingDisplay.jsx";
 export default function UploadSchemaPage() {
   const [schema, setSchema] = React.useState(null);
   const [uiSchema, setUiSchema] = React.useState({});
@@ -27,7 +29,9 @@ export default function UploadSchemaPage() {
   const [advanced, setAdvanced] = React.useState(null);
   const [insights, setInsights] = React.useState([]);
   const [businessReport, setBusinessReport] = React.useState(null);
-
+  const [predictionResult, setPredictionResult] = React.useState(null);
+  const [beyondEDAData, setBeyondEDAData] = React.useState(null);
+  const [analysisTiming, setAnalysisTiming] = useState(null);
   const tabs = React.useMemo(() => {
     const panels = [];
 
@@ -89,6 +93,8 @@ export default function UploadSchemaPage() {
     }
 
     if (descriptive) {
+      console.log("DescriptivePanel data:", descriptive);
+
       panels.push({
         id: "descriptive",
         title: "Descriptive Statistics",
@@ -152,6 +158,22 @@ export default function UploadSchemaPage() {
       });
     }
 
+    if (beyondEDAData) {
+      panels.push({
+        id: "beyond-eda",
+        title: "Beyond EDA",
+        content: <BeyondEDAViewer apiData={beyondEDAData} />
+      });
+    }
+
+    if (predictionResult) {
+      panels.push({
+        id: "prediction",
+        title: "Prediction Result",
+        content: <PredictionResultPanel data={predictionResult} />,
+      });
+    }
+    
     return panels;
   }, [
     understanding,
@@ -164,8 +186,10 @@ export default function UploadSchemaPage() {
     advanced,
     insights,
     businessReport,
+    predictionResult,
+    beyondEDAData 
   ]);
-
+  console.log("Data being passed to SchemaEditor:", rawPreviewRows); 
   return (
     <div className="page-upload-schema">
       <header className="upload-header">
@@ -174,6 +198,10 @@ export default function UploadSchemaPage() {
           Supported formats: CSV, XLSX, JSON. The system will automatically
           detect data types and generate schema metadata.
         </p>
+        {analysisTiming && (
+          <AnalysisTimingDisplay timing={analysisTiming} />
+        )}
+
       </header>
 
       <div className="upload-grid">
@@ -190,7 +218,10 @@ export default function UploadSchemaPage() {
               relationshipsResult,
               advancedResult,
               insightsResult,
-              businessReportResult
+              businessReportResult,
+              predictionResultData,
+              beyondEDAResult,
+              timingData
             ) => {
               setSchema(generatedSchema);
               setRawPreviewRows(previewRows || []);
@@ -203,6 +234,9 @@ export default function UploadSchemaPage() {
               setAdvanced(advancedResult || null);
               setInsights(insightsResult || []);
               setBusinessReport(businessReportResult || []);
+              setPredictionResult(predictionResultData);
+              setBeyondEDAData(beyondEDAResult || null);
+              setAnalysisTiming(timingData || null);
             }}
           />
         </div>
@@ -212,8 +246,10 @@ export default function UploadSchemaPage() {
             schema={schema}
             setSchema={setSchema}
             uiSchema={uiSchema}
+            data={rawPreviewRows}
+            setData={setRawPreviewRows}
             setUiSchema={setUiSchema}
-            previewRows={rawPreviewRows}
+            // previewRows={rawPreviewRows}
           />
         </div>
 

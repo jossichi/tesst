@@ -1,123 +1,223 @@
 import React from "react";
+import { Tabs, Table, Tag, Tooltip, Alert, Typography, Divider } from "antd";
+import {
+  BarChartOutlined,
+  OrderedListOutlined,
+  InfoCircleOutlined,
+} from "@ant-design/icons";
 import {
   BarChart,
   Bar,
   XAxis,
   YAxis,
-  Tooltip,
   CartesianGrid,
   ResponsiveContainer,
+  Tooltip as RechartsTooltip,
 } from "recharts";
 import "../assets/styles/descriptive-panel.scss";
-export default function DescriptivePanel({ descriptive }) {
-  if (!descriptive) return null;
 
-  // eslint-disable-next-line no-unused-vars
-  const { numeric, categorical, remarks } = descriptive;
+const { TabPane } = Tabs;
+const { Title, Paragraph } = Typography;
+
+const DescriptivePanel = ({ descriptive }) => {
+  const hasNumeric =
+    descriptive?.numeric && Object.keys(descriptive.numeric).length > 0;
+  const hasCategorical =
+    descriptive?.categorical && Object.keys(descriptive.categorical).length > 0;
+  const hasRemarks = descriptive?.remarks && descriptive.remarks.length > 0;
+
+  if (!hasNumeric && !hasCategorical && !hasRemarks) {
+    return (
+      <Alert
+        message="No descriptive statistics available."
+        type="info"
+        showIcon
+      />
+    );
+  }
+
+  // 🔢 Numeric table data
+  const numericColumns = Object.entries(descriptive.numeric || {}).map(
+    ([key, value]) => ({
+      key,
+      column: key,
+      ...value,
+    })
+  );
+
+  const numericCols = [
+    { title: "Column", dataIndex: "column", key: "column" },
+    { title: "Count", dataIndex: "count", key: "count" },
+    { title: "Min", dataIndex: "min", key: "min" },
+    { title: "Max", dataIndex: "max", key: "max" },
+    {
+      title: "Mean",
+      dataIndex: "mean",
+      key: "mean",
+      render: (val) => val?.toFixed(2),
+    },
+    { title: "Median", dataIndex: "median", key: "median" },
+    {
+      title: "Std Dev",
+      dataIndex: "std",
+      key: "std",
+      render: (val) => val?.toFixed(2),
+    },
+    {
+      title: "Skewness",
+      dataIndex: "skew",
+      key: "skew",
+      render: (val) =>
+        val > 1 || val < -1 ? (
+          <Tag color="volcano">{val.toFixed(2)}</Tag>
+        ) : (
+          <Tag>{val.toFixed(2)}</Tag>
+        ),
+    },
+    {
+      title: "Kurtosis",
+      dataIndex: "kurtosis",
+      key: "kurtosis",
+      render: (val) => <span>{val.toFixed(2)}</span>,
+    },
+    {
+      title: "Outliers",
+      dataIndex: "outliers",
+      key: "outliers",
+      render: (val) =>
+        val > 0 ? <Tag color="red">{val}</Tag> : <Tag color="green">0</Tag>,
+    },
+  ];
+
+  // 🔠 Categorical table data
+  const categoricalColumns = Object.entries(descriptive.categorical || {}).map(
+    ([key, value]) => ({
+      key,
+      column: key,
+      ...value,
+    })
+  );
+
+  const categoricalCols = [
+    { title: "Column", dataIndex: "column", key: "column" },
+    { title: "Count", dataIndex: "count", key: "count" },
+    { title: "Unique Values", dataIndex: "unique", key: "unique" },
+    {
+      title: "Top Values",
+      dataIndex: "top_values",
+      key: "top_values",
+      render: (values) =>
+        values.map((item, index) => (
+          <Tooltip title={`Percentage: ${item.percent}%`} key={index}>
+            <Tag>
+              {item.value} ({item.count})
+            </Tag>
+          </Tooltip>
+        )),
+    },
+  ];
 
   return (
-    <section className="mt-6 descriptive-section">
-      <h2 className="text-lg font-semibold mb-4">
-        Step 4: Descriptive Statistics
-      </h2>
-      {/* 📊 Numeric stats */}
-      {numeric && Object.keys(numeric).length > 0 ? (
-        <div className="numeric-section mt-4">
-          <h3 className="font-semibold mb-2">Quantitative Data (Numeric)</h3>
-          <table className="table-auto border-collapse border border-gray-300 w-full text-sm">
-            <thead className="bg-gray-100">
-              <tr>
-                <th className="border px-2 py-1">Column</th>
-                <th className="border px-2 py-1">Count</th>
-                <th className="border px-2 py-1">Min</th>
-                <th className="border px-2 py-1">Max</th>
-                <th className="border px-2 py-1">Mean</th>
-                <th className="border px-2 py-1">Median</th>
-                <th className="border px-2 py-1">Std</th>
-                <th className="border px-2 py-1">Skew</th>
-                <th className="border px-2 py-1">Kurtosis</th>
-                <th className="border px-2 py-1">Outliers</th>
-              </tr>
-            </thead>
-            <tbody>
-              {Object.entries(numeric).map(([col, stats]) => (
-                <tr key={col}>
-                  <td className="border px-2 py-1 font-medium">{col}</td>
-                  <td className="border px-2 py-1">{stats.count}</td>
-                  <td className="border px-2 py-1">{stats.min}</td>
-                  <td className="border px-2 py-1">{stats.max}</td>
-                  <td className="border px-2 py-1">{stats.mean.toFixed(2)}</td>
-                  <td className="border px-2 py-1">{stats.median}</td>
-                  <td className="border px-2 py-1">{stats.std.toFixed(2)}</td>
-                  <td className="border px-2 py-1">{stats.skew.toFixed(2)}</td>
-                  <td className="border px-2 py-1">
-                    {stats.kurtosis.toFixed(2)}
-                  </td>
-                  <td className="border px-2 py-1">{stats.outliers}</td>
-                </tr>
+    <section className="descriptive-panel">
+      <Typography className="mb-4">
+        <Title level={4}>Descriptive Statistics</Title>
+        <Paragraph type="secondary">
+          Below are descriptive statistics for both numeric and categorical
+          data, including tables, charts, and system-generated analytical
+          remarks.
+        </Paragraph>
+      </Typography>
+
+      <Tabs defaultActiveKey="1">
+        {/* ✅ Tab 1: Numeric */}
+        <TabPane
+          tab={
+            <span>
+              <BarChartOutlined /> Numeric
+            </span>
+          }
+          key="1">
+          {hasNumeric ? (
+            <Table
+              columns={numericCols}
+              dataSource={numericColumns}
+              pagination={{ pageSize: 10 }}
+              size="middle"
+              bordered
+            />
+          ) : (
+            <Alert message="No numeric data available." type="info" />
+          )}
+        </TabPane>
+
+        {/* ✅ Tab 2: Categorical */}
+        <TabPane
+          tab={
+            <span>
+              <OrderedListOutlined /> Categorical
+            </span>
+          }
+          key="2">
+          {hasCategorical ? (
+            <>
+              <Table
+                columns={categoricalCols}
+                dataSource={categoricalColumns}
+                pagination={{ pageSize: 10 }}
+                size="middle"
+                bordered
+              />
+              <Divider orientation="left">
+                Distribution Charts (Top Values)
+              </Divider>
+
+              {categoricalColumns.map((col) => (
+                <div key={col.key} style={{ marginBottom: 32 }}>
+                  <Title level={5}>{col.column}</Title>
+                  <ResponsiveContainer width="100%" height={250}>
+                    <BarChart data={col.top_values}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="value" />
+                      <YAxis />
+                      <RechartsTooltip />
+                      <Bar dataKey="count" fill="#4f46e5" />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
               ))}
-            </tbody>
-          </table>
-        </div>
-      ) : (
-        <p className="text-gray-500">Không có dữ liệu định lượng.</p>
-      )}
+            </>
+          ) : (
+            <Alert message="No categorical data available." type="info" />
+          )}
+        </TabPane>
 
-      {/* 🔠 Categorical stats */}
-      {categorical && Object.keys(categorical).length > 0 && (
-        <div className="categorical-section mt-6">
-          <h3 className="font-semibold mb-2">Categorical Data</h3>
-          {Object.entries(categorical).map(([col, info]) => (
-            <div key={col} className="mb-6">
-              <h4 className="font-semibold">{col}</h4>
-              <p className="text-sm text-gray-600 mb-2">
-                Total: {info.count} | Unique: {info.unique}
-              </p>
-
-              <table className="table-auto border-collapse border border-gray-300 w-full text-sm mb-2">
-                <thead className="bg-gray-100">
-                  <tr>
-                    <th className="border px-2 py-1">Value</th>
-                    <th className="border px-2 py-1">Count</th>
-                    {/* <th className="border px-2 py-1">%</th> */}
-                  </tr>
-                </thead>
-                <tbody>
-                  {info.top_values.map((v, idx) => (
-                    <tr key={idx}>
-                      <td className="border px-2 py-1">{v.value}</td>
-                      <td className="border px-2 py-1">{v.count}</td>
-                      {/* <td className="border px-2 py-1">{v.percent}%</td> */}
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-              {/* Biểu đồ bar */}
-              <ResponsiveContainer width="100%" height={250}>
-                <BarChart data={info.top_values}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="value" />
-                  <YAxis />
-                  <Tooltip />
-                  <Bar dataKey="count" fill="#4f46e5" />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {/* 📝 Remarks */}
-      {/* {remarks && remarks.length > 0 && (
-        <div className="remarks-section mt-6 bg-yellow-50 border-l-4 border-yellow-400 p-4">
-          <h3 className="font-semibold">Nhận xét</h3>
-          <ul className="list-disc list-inside">
-            {remarks.map((r, i) => (
-              <li key={i}>{r}</li>
-            ))}
-          </ul>
-        </div>
-      )} */}
+        {/* ✅ Tab 3: Remarks */}
+        <TabPane
+          tab={
+            <span>
+              <InfoCircleOutlined /> Remarks
+            </span>
+          }
+          key="3">
+          {hasRemarks ? (
+            <ul className="remarks-list">
+              {descriptive.remarks.map((r, idx) => (
+                <li key={idx} style={{ marginBottom: 8 }}>
+                  <Tag color="gold">#remark</Tag> {r}
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <Alert
+              message="No significant remarks found."
+              type="success"
+              showIcon
+            />
+          )}
+        </TabPane>
+      </Tabs>
     </section>
   );
-}
+};
+
+export default DescriptivePanel;

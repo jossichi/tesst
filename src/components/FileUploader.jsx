@@ -11,7 +11,7 @@ export default function FileUploader({ onSchema }) {
 
   const handleFile = async (file) => {
     if (!file) return;
-    setIsLoading(true); // ✅ Bật trạng thái isLoading
+    setIsLoading(true); 
     setError(null);
     try {
       const data = await uploadFileToServer(file);
@@ -26,7 +26,10 @@ export default function FileUploader({ onSchema }) {
         data.relationships,
         data.advanced,
         data.insights,
-        data.business_report
+        data.business_report,
+        data.prediction_result,
+        data.advanced_analysis,
+        data.analysis_timing 
       );
     } catch (err) {
       console.error("Lỗi khi upload:", err);

@@ -1,421 +1,414 @@
-// src/assets/styles/components/_schemaEditor.scss
+//======================================================================
+// SCHEMA EDITOR STYLES
+// Author: Senior Developer
+// Description: A professional, responsive, and maintainable stylesheet
+//              for the RJSF Schema Playground component.
+//======================================================================
 
-/* ============================================= */
-/* ==      COMPONENT: SCHEMA EDITOR           == */
-/* ============================================= */
+//-----------------------------------------------------
+// 1. CONFIGURATION & THEME
+//-----------------------------------------------------
 
-// Sử dụng lại các biến màu đã định nghĩa
+// 🔹 FONT STACK
+$font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+$font-mono: 'Fira Code', 'Roboto Mono', Menlo, Monaco, Consolas, 'Courier New', monospace;
+
+// 🔹 SIZING & SPACING
+$base-padding: 1rem;
+$base-radius: 6px;
+$base-gap: 1.5rem;
+
+// 🔹 TRANSITIONS
+$transition-speed: 200ms ease-in-out;
+
+// 🔹 CSS VARIABLES FOR DYNAMIC THEME (Dark Theme)
 :root {
-  --color-background: #111827;
-  --color-panel-bg: #1f2937;
-  --color-code-bg: #111827;
-  --color-border: #374151;
-  --color-text-primary: #f9fafb;
-  --color-text-secondary: #9ca3af;
-  --color-text-disabled: #6b7280;
-  --color-accent: #3b82f6;
-  --color-accent-hover: #2563eb;
-  --font-family-mono: "Fira Code", "JetBrains Mono", monospace;
-  --border-radius: 8px;
-  --transition: all 0.2s ease-in-out;
+  // Background Colors
+  --bg-main: #1a1b26;      // Deep dark background
+  --bg-panel: #24283b;     // Lighter panel background
+  --bg-inset: #16161e;     // Even darker for inputs, etc.
+  --bg-hover: #3b4261;
 
-  --color-accent-glow: rgba(59, 130, 246, 0.3); // Hiệu ứng glow
+  // Text Colors
+  --text-primary: #c0caf5;
+  --text-secondary: #a9b1d6;
+  --text-faded: #565f89;
+  --text-heading: #e0e0e0;
 
-  // Font chữrgba(61, 61, 61, 0.3)
-  --font-family-sans: "Inter", -apple-system, sans-serif;
+  // Border & Divider Colors
+  --border-color: #3b4261;
+  --border-focus: #7aa2f7;
 
-  // Các biến khác
-  --border-color: #374151;
-  --border-radius: 10px; // Tăng nhẹ độ bo tròn
-  --transition-fast: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-slow: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-} // Keyframe cho animation xuất hiện
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(15px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
+  // Accent Colors
+  --accent-primary: #7aa2f7;
+  --accent-secondary: #bb9af7;
+  --accent-success: #9ece6a;
+  --accent-warning: #e0af68;
+}
+
+//-----------------------------------------------------
+// 2. MIXINS & PLACEHOLDERS
+//-----------------------------------------------------
+
+@mixin flex-between {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+%panel-base {
+  background-color: var(--bg-panel);
+  border: 1px solid var(--border-color);
+  border-radius: $base-radius;
+  padding: $base-padding * 1.5;
+}
+
+//-----------------------------------------------------
+// 3. MAIN COMPONENT LAYOUT
+//-----------------------------------------------------
+
+.schema-editor {
+  background-color: var(--bg-main);
+  color: var(--text-primary);
+  font-family: $font-sans;
+  padding: $base-gap;
+  border-radius: $base-radius * 2;
+  display: flex;
+  flex-direction: column;
+  gap: $base-gap;
+  width: 100vw;
+  margin: 2rem auto;
+  border: 1px solid var(--border-color);
+
+  h3, h4 {
+    color: var(--text-heading);
+    margin: 0 0 1rem 0;
+    font-weight: 600;
   }
 }
 
-// Kiểu chung cho panel, kế thừa từ .panel nếu có
-.schema-editor {
-  background-color: var(--color-panel-bg);
-  border: 1px solid var(--border-color);
-  border-radius: var(--border-radius);
-  opacity: 0;
-  animation: fadeInUp 0.5s ease-out forwards;
-  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.3);
-  // Trạng thái trống
-  &.empty {
+//-----------------------------------------------------
+// 4. TOP HEADER & ACTIONS
+//-----------------------------------------------------
+
+.schema-top {
+  @include flex-between;
+  padding-bottom: $base-gap;
+  border-bottom: 1px solid var(--border-color);
+
+  .actions {
     display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 300px;
-    color: var(--color-text-secondary);
-    font-style: italic;
-  }
+    gap: 0.75rem;
 
-  // Header của panel
-  .schema-top {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1rem 1.5rem;
-    border-bottom: 1px solid var(--border-color);
-    background: linear-gradient(
-      to bottom,
-      rgba(255, 255, 255, 0.03),
-      transparent
-    );
-
-    h3 {
-      font-size: 1.2rem;
-      font-weight: 600;
-      margin: 0;
-      color: var(--color-text-primary);
-    }
-
-    // --- Nút bấm được nâng cấp ---
-    .actions button {
-      background-color: var(--color-accent);
-      border: 1px solid var(--color-accent-hover);
-      color: white;
-      padding: 0.6rem 1.2rem;
-      border-radius: 6px;
-      font-weight: 600;
+    button {
+      background-color: var(--bg-panel);
+      color: var(--text-secondary);
+      border: 1px solid var(--border-color);
+      padding: 0.5rem 1rem;
+      border-radius: $base-radius;
+      font-weight: 500;
       cursor: pointer;
-      transition: var(--transition-fast);
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+      transition: all $transition-speed;
 
       &:hover {
-        background-color: var(--color-accent-hover);
-        box-shadow: 0 0 15px var(--color-accent-glow);
-        transform: translateY(-2px);
+        background-color: var(--bg-hover);
+        border-color: var(--accent-primary);
+        color: var(--text-primary);
       }
-      &:active {
-        transform: translateY(0);
-      }
-    }
-  }
-  .left-panel .field-list,
-  .center-panel .sample-rows,
-  .right-panel .json-view {
-    // For Webkit-based browsers (Chrome, Safari, Edge)
-    &::-webkit-scrollbar {
-      width: 8px;
-      height: 8px;
-    }
-    &::-webkit-scrollbar-track {
-      background: transparent;
-    }
-    &::-webkit-scrollbar-thumb {
-      background-color: var(--border-color);
-      border-radius: 10px;
-      border: 2px solid var(--color-panel-bg); // Tạo khoảng cách với track
-    }
-    &::-webkit-scrollbar-thumb:hover {
-      background-color: var(--color-text-secondary);
-    }
-  }
-  // Body 3 cột
-  .schema-body {
-    display: grid;
-    // Tối ưu hóa layout: cột trái và phải cố định, cột giữa co giãn
-    grid-template-columns: minmax(280px, 1.2fr) 2fr minmax(320px, 1.5fr);
-    gap: 0; // Bỏ gap để dùng border làm vạch ngăn
-    padding: 1.5rem;
-  }
-
-  // Tiêu đề nhỏ trong các panel
-  h4 {
-    font-size: 0.875rem;
-    font-weight: 600;
-    color: var(--color-text-secondary);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    margin-bottom: 1rem;
-  }
-  // Panel bên trong các cột
-  .left-panel,
-  .center-panel,
-  .right-panel {
-    padding: 0 1.5rem;
-    opacity: 0;
-    animation: fadeInUp 0.5s ease-out forwards;
-
-    // Animation xuất hiện lần lượt
-    &:nth-child(1) {
-      animation-delay: 100ms;
-    }
-    &:nth-child(2) {
-      animation-delay: 200ms;
-    }
-    &:nth-child(3) {
-      animation-delay: 300ms;
-    }
-  }
-  .right-panel {
-    .json-view {
-      background-color: var(--color-code-bg);
-      border: 1px solid var(--color-border);
-      border-radius: var(--border-radius);
-      padding: 1rem;
-      max-height: 520px;
-      overflow: auto;
-
-      // Ghi đè style của react-json-view để hợp theme
-      div.react-json-view {
-        background-color: transparent !important;
-        font-family: var(--font-family-mono) !important;
-        font-size: 0.85rem !important; // Điều chỉnh font-size cho dễ đọc
-
-        .string-value,
-        .boolean-value,
-        .number-value {
-          font-weight: 500;
-        }
-
-        // Làm nổi bật các khóa (keys)
-        .object-key-string,
-        .array-key-string {
-          color: #e2e2e2 !important;
-          font-weight: 600;
-        }
-
-        // Làm nổi bật các giá trị (values)
-        .string-value {
-          color: #e6db74 !important; // Màu vàng
-        }
-        .number-value {
-          color: #ae81ff !important; // Màu tím
-        }
-        .boolean-value {
-          color: #a6e22e !important; // Màu xanh lá
-        }
-
-        // Làm nổi bật các dấu ngoặc
-        .fa-caret-right,
-        .fa-caret-down {
-          color: var(--color-text-secondary) !important;
-          opacity: 0.7;
-        }
-
-        .object-container,
-        .array-container {
-          border-left: 1px solid rgba(255, 255, 255, 0.1);
-          padding-left: 1rem;
-        }
+      
+      &:disabled {
+        background-color: var(--accent-success);
+        color: var(--bg-main);
+        border-color: var(--accent-success);
+        cursor: default;
       }
     }
   }
-  // Vạch ngăn cách giữa các cột
-  .center-panel {
-    border-left: 1px solid var(--border-color);
-    border-right: 1px solid var(--border-color);
-  }
+}
 
-  h4 {
-    font-size: 0.8rem;
-    font-weight: 700;
-    color: var(--color-text-secondary);
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    margin-bottom: 1rem;
-    padding-bottom: 0.5rem;
-    border-bottom: 1px solid var(--border-color);
-  }
-  /* --- LEFT PANEL --- */
-  .left-panel .field-list {
+//-----------------------------------------------------
+// 5. SCHEMA BODY (2-COLUMN LAYOUT)
+//-----------------------------------------------------
+
+.schema-body {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: $base-gap;
+}
+
+// --- Left Panel: Field Toggles ---
+.left-panel {
+  @extend %panel-base;
+  max-height: 60vh;
+  overflow-y: auto;
+  
+  .field-list {
     list-style: none;
     padding: 0;
     margin: 0;
-    max-height: 520px;
-    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
 
-    li {
-      margin-bottom: 0.25rem;
+    li label {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.5rem;
+      border-radius: $base-radius;
+      cursor: pointer;
+      transition: background-color $transition-speed;
 
-      label {
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-        padding: 0.6rem 0.75rem;
-        border-radius: 6px;
-        cursor: pointer;
-        transition: background-color 0.2s ease;
-
-        &:hover {
-          background-color: lighten($color: #1f2937, $amount: 5%);
-        }
-
-        // --- Custom Checkbox ---
-        input[type="checkbox"] {
-          appearance: none; // Ẩn hoàn toàn checkbox gốc
-          flex-shrink: 0;
-          position: relative;
-          width: 20px;
-          height: 20px;
-          border: 2px solid var(--border-color);
-          border-radius: 4px;
-          background-color: var(--color-background);
-          transition: var(--transition-fast);
-          cursor: pointer;
-
-          // Hiệu ứng checkmark
-          &::before {
-            content: "";
-            position: absolute;
-            top: 2px;
-            left: 6px;
-            width: 5px;
-            height: 10px;
-            border: solid white;
-            border-width: 0 3px 3px 0;
-            transform: rotate(45deg) scale(0); // Bắt đầu ẩn
-            opacity: 0;
-            transition: all 0.2s cubic-bezier(0.18, 0.89, 0.32, 1.28); // Hiệu ứng nảy
-          }
-
-          &:checked {
-            background-color: var(--color-accent);
-            border-color: var(--color-accent);
-            &::before {
-              transform: rotate(45deg) scale(1);
-              opacity: 1;
-            }
-          }
-
-          &:not(:checked) ~ .field-name,
-          &:not(:checked) ~ .field-type {
-            opacity: 0.4;
-            text-decoration: line-through;
-          }
-        }
+      &:hover {
+        background-color: var(--bg-hover);
       }
 
-      .custom-checkbox {
-        flex-shrink: 0;
-        position: relative;
-        width: 18px;
-        height: 18px;
-        border: 2px solid var(--color-border);
-        border-radius: 4px;
-        background-color: var(--color-background);
-        transition: all 0.2s ease;
-
-        // Checkmark (dấu tick)
-        &::after {
-          content: "";
-          position: absolute;
-          left: 50%;
-          top: 45%;
-          width: 5px;
-          height: 10px;
-          border: solid white;
-          border-width: 0 2px 2px 0;
-          opacity: 0;
-          transform: translate(-50%, -50%) rotate(45deg) scale(0.5);
-          transition: all 0.2s ease;
-        }
-      }
-      .field-name,
-      .field-type {
-        transition: var(--transition-slow);
-      }
       .field-name {
         font-weight: 500;
-        transition: var(--transition);
+        flex-grow: 1;
       }
-
+      
       .field-type {
-        margin-left: auto;
-        font-size: 0.75rem;
-        font-family: var(--font-family-mono);
-        color: var(--color-text-secondary);
-        background-color: var(--color-border);
+        font-family: $font-mono;
+        font-size: 0.8em;
+        color: var(--text-faded);
+        background-color: var(--bg-inset);
         padding: 0.15rem 0.5rem;
         border-radius: 4px;
-        transition: var(--transition);
       }
     }
-  }
+    
+    // Custom Checkbox
+    input[type="checkbox"] {
+      appearance: none;
+      width: 18px;
+      height: 18px;
+      border: 2px solid var(--border-color);
+      border-radius: 4px;
+      cursor: pointer;
+      position: relative;
+      transition: all $transition-speed;
+      flex-shrink: 0;
 
-  /* --- CENTER PANEL --- */
-  .center-panel {
-    // Styling cho form được tạo bởi RJSF
-    .rjsf-preview {
-      background-color: var(--color-background);
-      border: 1px solid var(--color-border);
-      border-radius: var(--border-radius);
-      padding: 1rem;
-      margin-bottom: 1.5rem;
-
-      // Ghi đè style của RJSF
-      .form-group {
-        margin-bottom: 1rem;
-      }
-      label {
-        font-weight: 500;
-        font-size: 0.9rem;
-        color: var(--color-text-secondary);
-        display: block;
-        margin-bottom: 0.5rem;
-      }
-      input[type="text"],
-      input[type="number"],
-      select {
-        width: 100%;
-        background-color: var(--color-panel-bg);
-        border: 1px solid var(--color-border);
-        color: var(--color-text-primary);
-        padding: 0.6rem 0.75rem;
-        border-radius: 6px;
-        transition: var(--transition);
-        &:focus {
-          outline: none;
-          border-color: var(--color-accent);
-          box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+      &:checked {
+        background-color: var(--accent-primary);
+        border-color: var(--accent-primary);
+        
+        &::after {
+          content: '✔';
+          position: absolute;
+          color: var(--bg-main);
+          font-size: 14px;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
         }
       }
-      // Ẩn nút submit mặc định của RJSF
-      button[type="submit"] {
-        display: none;
-      }
     }
+  }
+}
 
-    // Kiểu cho khu vực xem dữ liệu mẫu
-    .sample-rows {
-      background-color: var(--color-code-bg);
-      border: 1px solid var(--color-border);
-      border-radius: var(--border-radius);
-      padding: 1rem;
-      font-family: var(--font-family-mono);
-      font-size: 0.85rem;
-      max-height: 250px;
-      overflow: auto;
-      white-space: pre-wrap;
+// --- Right Panel: JSON View ---
+.right-panel {
+  @extend %panel-base;
+  display: flex;
+  flex-direction: column;
+  
+  .json-view {
+    flex-grow: 1;
+    background-color: #282a36; // Monokai background for seamless look
+    border-radius: $base-radius;
+    padding: $base-padding;
+    overflow: auto;
+    
+    // Target ReactJson component
+    .react-json-view {
+      background-color: transparent !important;
+    }
+  }
+}
+
+//======================================================================
+// 6. DATA PREVIEW TABLE (ENHANCED UX VERSION)
+//======================================================================
+
+.data-preview {
+  @extend %panel-base;
+  display: flex;
+  flex-direction: column;
+
+  .no-data-msg {
+    color: var(--text-faded);
+    text-align: center;
+    padding: 3rem 2rem;
+    font-style: italic;
+    border: 2px dashed var(--border-color);
+    border-radius: $base-radius;
+    width: 100%;
+    margin: auto; // Center it within the flex container
+
+    &::before {
+      content: '🗂️'; // Emoji as a simple icon
+      display: block;
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+      opacity: 0.5;
+    }
+  }
+}
+
+//--- Wrapper with intelligent scroll indicators ---
+.data-table-wrapper {
+  overflow-x: auto;
+  max-height: 400px;
+  // Add subtle shadows to indicate scrollability, a very pro touch
+  background:
+    // linear-gradient(to right, white 30%, rgba(255, 255, 255, 0)),
+    // linear-gradient(to right, rgba(255, 255, 255, 0), white 70%) 100% 0,
+    radial-gradient(farthest-side at 0 50%, rgba(0,0,0,.2), rgba(0,0,0,0)),
+    radial-gradient(farthest-side at 100% 50%, rgba(0,0,0,.2), rgba(0,0,0,0)) 100% 0;
+  background-repeat: no-repeat;
+  background-color: transparent; // Match panel color
+  background-size: 40px 100%, 40px 100%, 14px 100%, 14px 100%;
+  background-attachment: local, local, scroll, scroll;
+  border-radius: $base-radius;
+}
+
+
+.data-table {
+  width: 100%;
+  border-collapse: separate; // Use separate for better border control
+  border-spacing: 0;
+  font-size: 0.9rem;
+
+  thead th {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background-color: rgba(var(--bg-inset), 0.95); // Slightly transparent for depth
+    backdrop-filter: blur(4px); // Glassmorphism effect
+    color: var(--text-secondary);
+    font-weight: 600;
+    padding: 0.75rem 1rem;
+    text-align: left;
+    border-bottom: 2px solid var(--accent-primary);
+    white-space: nowrap;
+    transition: background-color $transition-speed;
+    cursor: default; // Default cursor
+
+    // Hint for sortable columns (if you add this feature)
+    &.sortable {
+      cursor: pointer;
+      &:hover {
+        background-color: var(--bg-hover);
+        color: var(--text-primary);
+      }
     }
   }
 
-  /* --- RIGHT PANEL --- */
-  .right-panel {
-    .json-view {
-      background-color: var(--color-code-bg);
-      border: 1px solid var(--color-border);
-      border-radius: var(--border-radius);
-      padding: 1rem;
-      max-height: 520px;
-      overflow: auto;
+  tbody {
+    tr {
+      transition: background-color $transition-speed, box-shadow $transition-speed;
 
-      // Ghi đè một vài style của react-json-view để hợp theme
-      div.react-json-view {
-        background-color: transparent !important;
-        font-family: var(--font-family-mono) !important;
+      &:nth-child(even) {
+        background-color: rgba(var(--bg-main), 0.5);
+      }
+
+      &:hover {
+        background-color: var(--bg-hover);
+        // "Lift" the row on hover for a premium feel
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        position: relative;
+        z-index: 1;
       }
     }
+
+    td {
+      padding: 0; // Remove padding from TD, move it to input for full control
+      border-bottom: 1px solid var(--border-color);
+      position: relative; // For positioning cell state indicators
+      white-space: nowrap;
+
+      // --- State-aware cells: The CORE of the UX upgrade ---
+
+      // 1. Cell with changed ("dirty") data
+      &.dirty-cell::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 3px;
+        height: 100%;
+        background-color: var(--accent-warning);
+        z-index: 2;
+        border-radius: 3px 0 0 3px;
+      }
+      
+      // 2. Cell with invalid data
+      &.invalid-cell {
+        input {
+          box-shadow: inset 0 0 0 2px rgba(var(--accent-error, 247, 119, 137), 0.5);
+          color: var(--accent-error, #f77789);
+        }
+      }
+
+      // --- Smart data alignment ---
+      &[data-type="numeric"] input {
+        text-align: right;
+        font-family: $font-mono;
+      }
+    }
+    
+    input {
+      // Input now controls the full cell space
+      width: 100%;
+      height: 100%;
+      background-color: transparent;
+      border: 2px solid transparent; // Use thicker border for focus state
+      color: var(--text-primary);
+      padding: 0.75rem 1rem;
+      border-radius: 0;
+      font-family: $font-sans;
+      font-size: inherit;
+      outline: none;
+      transition: all $transition-speed;
+
+      &:focus {
+        background-color: var(--bg-inset);
+        border-color: var(--border-focus);
+        position: relative;
+        z-index: 2; // Ensure focused input is on top of other elements
+      }
+    }
+  }
+}
+
+//-----------------------------------------------------
+// 7. RESPONSIVE DESIGN
+//-----------------------------------------------------
+
+@media (max-width: 992px) {
+  .schema-body {
+    grid-template-columns: 250px 1fr; // Shrink sidebar on tablets
+  }
+}
+
+@media (max-width: 768px) {
+  .schema-editor {
+    padding: $base-gap * 0.75;
+  }
+  
+  .schema-top {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .schema-body {
+    grid-template-columns: 1fr; // Stack panels on mobile
+  }
+
+  .left-panel {
+    max-height: 30vh; // Constrain height on mobile
   }
 }

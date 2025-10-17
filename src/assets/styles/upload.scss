@@ -1,9 +1,4 @@
 // src/assets/styles/upload.scss
-
-/* ============================================= */
-/* ==   1. BIẾN MÀU & THIẾT KẾ (DESIGN TOKENS)  == */
-/* ============================================= */
-
 :root {
   // Bảng màu Dark Mode chuyên nghiệp
   --color-background: #111827; // Nền chính (Xám đen đậm)
@@ -28,10 +23,6 @@
   --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
     0 2px 4px -2px rgba(0, 0, 0, 0.1);
 }
-
-/* ============================================= */
-/* ==      2. BỐ CỤC & KIỂU CHUNG             == */
-/* ============================================= */
 
 body {
   background-color: var(--color-background);
@@ -91,10 +82,6 @@ body {
   }
 }
 
-/* ============================================= */
-/* ==      3. KIỂU CHO TỪNG COMPONENT         == */
-/* ============================================= */
-
 /* --- File Uploader --- */
 .file-uploader {
   .drop-zone {
@@ -110,10 +97,10 @@ body {
     background-color: var(--color-panel-bg);
     transition: var(--transition);
 
-    &:hover {
-      border-color: var(--color-accent);
-      background-color: darken($color: #1f2937, $amount: 2%);
-    }
+    // &:hover {
+    //   border-color: var(--color-accent);
+    //   background-color: darken($color: #1f2937, $amount: 2%);
+    // }
 
     input[type="file"] {
       display: none;
@@ -140,9 +127,9 @@ body {
       cursor: pointer;
       transition: var(--transition);
 
-      &:hover {
-        background-color: var(--color-accent-hover);
-      }
+      // &:hover {
+      //   background-color: var(--color-accent-hover);
+      // }
     }
   }
 }
@@ -187,9 +174,9 @@ body {
           margin-bottom: 4px;
         }
 
-        &:hover {
-          background-color: lighten($color: #1f2937, $amount: 5%);
-        }
+        // &:hover {
+        //   background-color: lighten($color: #1f2937, $amount: 5%);
+        // }
 
         label {
           display: flex;
@@ -262,9 +249,9 @@ body {
 
     tbody tr {
       transition: var(--transition);
-      &:hover {
-        background-color: lighten($color: #1f2937, $amount: 2%);
-      }
+      // &:hover {
+      //   background-color: lighten($color: #1f2937, $amount: 2%);
+      // }
     }
 
     pre {

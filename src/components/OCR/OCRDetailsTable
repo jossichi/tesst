@@ -1,0 +1,88 @@
+import React from "react";
+
+const MAX_ROWS = 100;
+
+const OCRDetailsTable = ({ details }) => {
+  if (!details || details.length === 0) {
+    return <p className="no-details-message">Không có dữ liệu chi tiết.</p>;
+  }
+
+  const isHybridModel = details[0].hasOwnProperty("models");
+
+  return (
+    <div className="table-scroll-container">
+      <table className="details-table">
+        <thead className="table-header">
+          <tr>
+            <th>Văn Bản Cuối Cùng</th>
+            {isHybridModel && (
+              <>
+                <th className="model-header">Tesseract</th>
+                <th className="model-header">EasyOCR</th>
+                <th className="model-header">FastTextSpotter</th>
+              </>
+            )}
+            {!isHybridModel && <th>Độ Tin Cậy</th>}
+            <th>Vị trí (x, y)</th>
+          </tr>
+        </thead>
+        <tbody>
+          {details.slice(0, MAX_ROWS).map((detail, index) => (
+            <tr key={index}>
+              {/* Cột văn bản cuối cùng */}
+              <td className="cell-final-text">
+                {isHybridModel ? detail.final_text : detail.text}
+              </td>
+
+              {/* Cột so sánh các model (nếu có) */}
+              {isHybridModel ? (
+                <>
+                  <td className="cell-model-result">
+                    {detail.models?.tesseract?.text || "N/A"}
+                    <span className="confidence-score">
+                      ({(detail.models?.tesseract?.conf || 0).toFixed(2)})
+                    </span>
+                  </td>
+                  <td className="cell-model-result">
+                    {detail.models?.easyocr?.text || "N/A"}
+                    <span className="confidence-score">
+                      ({(detail.models?.easyocr?.conf || 0).toFixed(2)})
+                    </span>
+                  </td>
+                  <td className="cell-model-result">
+                    {detail.models?.fasttextspotter?.text || "N/A"}
+                    <span className="confidence-score">
+                      ({(detail.models?.fasttextspotter?.conf || 0).toFixed(2)})
+                    </span>
+                  </td>
+                </>
+              ) : (
+                // Cột confidence cho trường hợp fallback
+                <td className="cell-confidence">
+                  {detail.confidence?.toFixed(2) || "N/A"}
+                </td>
+              )}
+
+              {/* Cột vị trí */}
+              <td className="cell-bbox">
+                {`x:${detail.bbox?.x}, y:${detail.bbox?.y}`}
+              </td>
+            </tr>
+          ))}
+
+          {details.length > MAX_ROWS && (
+            <tr>
+              <td
+                colSpan={isHybridModel ? 5 : 3}
+                className="table-ellipsis-row">
+                ... và {details.length - MAX_ROWS} vùng văn bản khác.
+              </td>
+            </tr>
+          )}
+        </tbody>
+      </table>
+    </div>
+  );
+};
+
+export default OCRDetailsTable;
